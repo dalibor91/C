@@ -3,8 +3,14 @@
 #include <string.h>
 
 char * getLine(limit) {
-	int c, cur = 0;
+	int c=0, cur = 0;
 	char line[limit];
+	
+	//Initilize whole char arr to \0
+	int i ;
+	for (i =0 ; i < limit; i++) {
+		line[i] =0;
+	}
 	
 	while (((c = getc(stdin)) != '\n')) {
 		if ((cur < limit-1)) {
@@ -13,23 +19,57 @@ char * getLine(limit) {
 		}
 	}
 	
-	line[cur+1] = '\0'; 
-	char * str = ((char *) malloc( sizeof(line) ));
-	strcpy(str, line);
-	return str;
+	fflush(stdin);
+
+	return strdup(line);
 }
 
-void trimString(char * str, char remove) {
-	int index=0, 
-		i=0, 
-		length = (sizeof(str) / sizeof(char));
+void initString(char * str, int asciiChar) {
+	int i; 
+	for (i=0; i<strlen(str); i++) {
+		str[i] = asciiChar;
+	}
+}
+
+char * trimString(char * str, char remove) {
+	int i=0, 
+		length = strlen(str);
 	
 	int indexfront = 0, 
-		indexback = (length - 1);
-
-	if (str[indexfront] == remove || str[indexback] == remove) {
-		//todo
+		indexback = (length - 1),
+		removed = 0;
+	
+	while ((str[indexfront] == remove || str[indexback] == remove)) {
+		removed = 1;
+		if (str[indexfront] == remove) {
+			indexfront++;
+		}
+		
+		if (str[indexback] == remove) {
+			indexback--;
+		}
+		//whole string needs to be trimmed, return ""
+		if (indexback < indexfront) {
+			free(str);
+			return strdup("");
+		}
 	} 
+	
+	if (removed == 1) {		
+		char * copy = (char *)malloc((1+indexback-indexfront) * sizeof(char));
+
+		initString(copy, 0);
+		for (i = indexfront; i<=indexback; i++) {			
+			copy[i-indexfront] = str[i];
+		}
+		//mark end 
+		copy[indexback+1] = '\0';
+		//release original str
+		free(str);
+		return copy;
+	}
+	//return original str
+	return str;
 }
 
 void startTerminal() {
@@ -38,14 +78,19 @@ void startTerminal() {
 		
 		char *f = getLine(20);
 		
-		trimString(f ,' ');
+		char *cmd = trimString(f ,' ');
 		
-		if (strcmp(f, "help") == 0) {
+		if (strcmp(cmd, "") == 0) {
+			free(cmd);
+			continue;
+		}
+		
+		if (strcmp(cmd, "help") == 0) {
 			printf("For help ask google\n");
 		}
 		
-		printf ("%% Entered \"%s\"\n", f);
-		free(f);
+		printf ("%% Entered \"%s\"\n", cmd);
+		free(cmd);
 	}
 }
 
