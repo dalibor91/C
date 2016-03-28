@@ -24,13 +24,6 @@ char * getLine(limit) {
 	return strdup(line);
 }
 
-void initString(char * str, int asciiChar) {
-	int i; 
-	for (i=0; i<strlen(str); i++) {
-		str[i] = asciiChar;
-	}
-}
-
 char * trimString(char * str, char remove) {
 	int i=0, 
 		length = strlen(str);
@@ -58,7 +51,6 @@ char * trimString(char * str, char remove) {
 	if (removed == 1) {		
 		char * copy = (char *)malloc((1+indexback-indexfront) * sizeof(char));
 
-		initString(copy, 0);
 		for (i = indexfront; i<=indexback; i++) {			
 			copy[i-indexfront] = str[i];
 		}
@@ -100,8 +92,3 @@ int main () {
 	
 	return 0;
 }
-
-
-
-
-
